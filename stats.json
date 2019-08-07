@@ -1,0 +1,61 @@
+{
+  "swears": {
+    "frick": 1,
+    "dang": 1,
+    "darn": 1,
+    "damn": 4,
+    "ass": 1,
+    "damnit": 1,
+    "fuck": 2,
+    "shit": 1,
+    "jesus fuck": 1,
+    "bitch": 1,
+    "hecc": 1,
+    "poo": 1,
+    "heck": 1
+  },
+  "users": {
+    "203281664699269121": {
+      "names": [
+        "Ugff"
+      ],
+      "swears": {
+        "fuck": 2,
+        "damn": 2,
+        "shit": 1,
+        "jesus fuck": 1,
+        "bitch": 1,
+        "hecc": 1,
+        "poo": 1
+      },
+      "total": 9
+    },
+    "203364391331037184": {
+      "names": [
+        "Abrahamster"
+      ],
+      "swears": {
+        "heck": 1
+      },
+      "total": 1
+    }
+  },
+  "guilds": {
+    "277674038069952523": {
+      "names": [
+        "BOT TEST"
+      ],
+      "swears": {
+        "fuck": 2,
+        "damn": 2,
+        "shit": 1,
+        "jesus fuck": 1,
+        "bitch": 1,
+        "hecc": 1,
+        "poo": 1,
+        "heck": 1
+      },
+      "total": 10
+    }
+  }
+}

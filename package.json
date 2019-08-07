@@ -1,0 +1,18 @@
+{
+  "name": "swearbot",
+  "version": "1.0.0",
+  "description": "Shows statistics about swears that are used on Discord servers.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js && pause",
+    "lint": "eslint --ext .js ."
+  },
+  "author": "Evan Tichenor",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1"
+  }
+}
