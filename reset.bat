@@ -1,0 +1,1 @@
+cp default_stats.json stats.json

@@ -1,4 +1,5 @@
-const NOTICE = '\n**Notice: This bot, and programmer, does not condone using many of these words.**';
+const NOTICE = '**Notice: This bot, and programmer, does not condone using many of these words.**\n\n';
+const DEBUG = true;
 
 const stuff = require('./secret');
 const Discord = require('discord.js');
@@ -13,45 +14,46 @@ var stats = require(stuff.file); // ez
 	// guilds: {} // 'guild id': {'names': [], 'swears': {}, 'total': 0}
 // };
 
-function getSwearStats(swears) {
-	// FIXME? might need to only have top 5 swears, have n number of swears shown
+function getSwearStats(swears, n = 5) {
+	let arr = Object.keys(swears)
+		.sort((a, b) => swears[b] - swears[a]);
 	let rtn = '```';
-	for(let swear in swears) {
-		rtn += `${swear}: ${swears[swear]}\n`;
+	for(let i = 0; i < n && i < arr.length; i++) {
+		rtn += `${arr[i]}: ${swears[arr[i]]}\n`;
 	}
 	return rtn + '```';
 }
 
 function getStats(thing) {
-	return `${thing.names.join(', ')}:\n${getSwearStats(thing.swears)}`;
+	return `${thing.names.join(', ')}: Total: ${thing.total}\n${getSwearStats(thing.swears)}`;
+}
+
+function getWorstStat(stat, statString, func = getStats, n = 5) {
+	let arr = Object.values(stat)
+		.sort((a, b) => b.total - a.total);
+	let rtn = `Top ${n} **Worst** ${statString}: \n`;
+	// add top n worst things 
+	for(let i = 0; i < n && i < arr.length; i++) {
+		rtn += func(arr[i]);
+	}
+
+	return rtn;
 }
 
 function getGuildStats(guildId) {
 	return getStats(stats.guilds[guildId]);
 }
 
-function getWorstGuilds() {
-	let rtn = '**Worst** Guilds: \n';
-	// TODO: get top n guilds
-	for(let guild in stats.guilds) {
-		rtn += getGuildStats(guild);
-	}
-
-	return rtn;
+function getWorstGuilds(n = 5) {
+	return getWorstStat(stats.guilds, 'Guilds');
 }
 
 function getUserStats(userId) {
 	return getStats(stats.users[userId]);
 }
 
-function getWorstUsers() {
-	let rtn = '**Worst** Users: \n';
-	// TODO: get top n useers
-	for(let user in stats.users) {
-		rtn += getUserStats(user);
-	}
-
-	return rtn;
+function getWorstUsers(n = 5) {
+	return getWorstStat(stats.users, 'Users');
 }
 
 function doStat(thing, name, swear) {
@@ -81,29 +83,47 @@ client.on('ready', () => {
 
 client.on('message', msg => {
 	if(msg.author.id == stuff.clientId)
-		return; // ignore bot messages
+		return; // ignore swearbot messages
 
 	let lower = msg.content.toLowerCase();
 	let args = lower.split(' ');
+	// this is disgustingly long
 	if(args[0] == '!swear') {
 		switch(args[1]) {
 			case 'help':
-				msg.channel.send('!swear [...] ```\nhelp: shows this help message \nlist: shows the list of words that are counted \nglobal: shows the global statistics of the bot \nstats: shows the server stats```');
+				msg.channel.send('!swear [...] ```\nhelp: shows this help message \nlist: shows the list of words that are counted \n' +
+				'top [users, servers, swears]: shows the global statistics of the bot \nstats: shows the server stats```');
 				break;
 			case 'list':
-				msg.channel.send(`Swears that are counted: ${NOTICE}\n${stuff.swears.join(', ')}.`);
+				msg.channel.send(`${NOTICE}\nSwears that are counted:\n${stuff.swears.join(', ')}.`);
 				break;
-			case 'global':
-				msg.channel.send(`Total Swears Used: ${NOTICE}\n${getSwearStats(stats.swears)}`);
-				msg.channel.send(`Worst Servers: ${NOTICE}\n${getWorstGuilds()}`);
-				msg.channel.send(`Worst Users: ${NOTICE}\n${getWorstUsers()}`);
+			case 'top':
+				if(args.length >= 3) {
+					if(args[2] == 'users') {
+						msg.channel.send(`${NOTICE}${getWorstUsers()}`);
+					} else if(args[2] == 'servers' || args[2] == 'guilds') {
+						msg.channel.send(`${NOTICE}${getWorstGuilds()}`);
+					} else if(args[2] == 'swears') {
+						msg.channel.send(`${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`);
+					} 
+				} else {
+					msg.channel.send(`${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`);
+				}
+				break;
+			case 'shutdown':
+			case 'restart':
+				if(msg.author.id == stuff.devId) {
+					msg.author.send('Shutting Down...').then(() => process.exit(0));
+				}
 				break;
 			case 'stat':
-			default:
-				msg.channel.send(`Total Swears Used: ${NOTICE}\n${getSwearStats(stats.guilds[msg.guild.id].swears)}\nTotal: ${stats.guilds[msg.guild.id].total}`);
+				msg.channel.send(`${NOTICE}\nTop 5 Swears in this Server:\n${getSwearStats(stats.guilds[msg.guild.id].swears)}\nTotal: ${stats.guilds[msg.guild.id].total}`);
 				break;
+			default:
+				// user mentions, if none, show help
+				// TODO
 		}
-		return;
+		return; // skip the rest because we just got a command
 	}
 
 	let author = msg.author;
@@ -114,46 +134,17 @@ client.on('message', msg => {
 			if(stats.swears[swear] == null)
 				stats.swears[swear] = 0; // define as initial value if not
 			stats.swears[swear]++;
+			stats.total++;
 
-			// TODO: these are the same, see if works
-			let guild = stats.guilds[mGuild.id];
-			stats.guilds[mGuild.id] = doStat(guild, mGuild.name, swear);
-			// if(guild === 'undefined') {
-			// 	guild = stats.guilds[mGuild.id] = {
-			// 		'names': [mGuild.name],
-			// 		'swears': {},
-			// 		'total': 0
-			// 	};
-			// }
-			// if(!guild.names.includes(mGuild.name)) {
-			// 	guild.names.push(mGuild.name);
-			// }
-
-			// if(guild.swears[swear] === 'undefined')
-			// 	guild.swears[swear] = 0; // define as initial value if not
-
-			// guild.swears[swear]++;
-			// guild.total++;
+			if(mGuild.available) {
+				let guild = stats.guilds[mGuild.id];
+				stats.guilds[mGuild.id] = doStat(guild, mGuild.name, swear);
+			} else {
+				console.log(`Discord server outage detected on ${new Date().toISOString()}.`)
+			}
 			
-			// TODO: these are the same, see if works
 			let user = stats.users[author.id];
 			stats.users[author.id] = doStat(user, author.username, swear);
-			// if(user === 'undefined') {
-			// 	user = stats.users[author.id] = {
-			// 		'names': [author.username],
-			// 		'swears': {},
-			// 		'total': 0
-			// 	};
-			// }
-			// if(!user.names.includes(author.username)) {
-			// 	user.names.push(author.username);
-			// }
-
-			// if(user.swears[swear] === 'undefined')
-			// 	user.swears[swear] = 0; // define as initial value if not
-			
-			// user.swears[swear]++;
-			// user.total++;
 		}
 	}
 });
@@ -165,6 +156,6 @@ setInterval( () => {
 	let data = JSON.stringify(stats, null, 2); // make human readable
 	fs.writeFile(stuff.file, data, err => {
 		if(err) console.log(err);
-		console.log('Data written to file, unless printed otherwise.');
+		if(DEBUG) console.log('Data written to file, unless printed otherwise.');
 	});
-}, 60000); // every minute
+}, 300000); // every 5 minutes

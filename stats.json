@@ -2,18 +2,22 @@
   "swears": {
     "frick": 1,
     "dang": 1,
-    "darn": 1,
-    "damn": 4,
-    "ass": 1,
+    "darn": 2,
+    "damn": 5,
+    "ass": 3,
     "damnit": 1,
-    "fuck": 2,
-    "shit": 1,
+    "fuck": 4,
+    "shit": 3,
     "jesus fuck": 1,
-    "bitch": 1,
+    "bitch": 3,
     "hecc": 1,
     "poo": 1,
-    "heck": 1
+    "heck": 2,
+    "shit ass": 2,
+    "hell": 1,
+    "cunt": 2
   },
+  "total": 33,
   "users": {
     "203281664699269121": {
       "names": [
@@ -26,9 +30,10 @@
         "jesus fuck": 1,
         "bitch": 1,
         "hecc": 1,
-        "poo": 1
+        "poo": 1,
+        "heck": 1
       },
-      "total": 9
+      "total": 10
     },
     "203364391331037184": {
       "names": [
@@ -38,6 +43,35 @@
         "heck": 1
       },
       "total": 1
+    },
+    "203658309796888576": {
+      "names": [
+        "Tank"
+      ],
+      "swears": {
+        "fuck": 1,
+        "ass": 1,
+        "shit": 1,
+        "bitch": 2,
+        "shit ass": 1,
+        "damn": 1,
+        "hell": 1,
+        "darn": 1
+      },
+      "total": 9
+    },
+    "203281277774856193": {
+      "names": [
+        "clydeguy"
+      ],
+      "swears": {
+        "cunt": 2,
+        "fuck": 1,
+        "ass": 1,
+        "shit": 1,
+        "shit ass": 1
+      },
+      "total": 6
     }
   },
   "guilds": {
@@ -56,6 +90,24 @@
         "heck": 1
       },
       "total": 10
+    },
+    "203282340779130880": {
+      "names": [
+        "hhhehehe"
+      ],
+      "swears": {
+        "fuck": 2,
+        "ass": 2,
+        "shit": 2,
+        "bitch": 2,
+        "shit ass": 2,
+        "damn": 1,
+        "hell": 1,
+        "darn": 1,
+        "heck": 1,
+        "cunt": 2
+      },
+      "total": 16
     }
   }
 }
