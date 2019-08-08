@@ -121,7 +121,10 @@ client.on('message', msg => {
 				break;
 			default:
 				// user mentions, if none, show help
-				// TODO
+				for(let user in msg.mentions.users) {
+					msg.channel.send(getUserStats(msg.mentions.users[user].id));
+				}
+
 		}
 		return; // skip the rest because we just got a command
 	}
