@@ -77,54 +77,77 @@ function doStat(thing, name, swear) {
 	return thing;
 }
 
+function commands(msg, args) {
+	switch(args[1]) {
+		// case 'about':
+		// 	return `Created by <@${stuff.devId}> because I thought it was an ok concept.`;
+		case 'feedback':
+			let feedback = msg.content.substring(16).trim();
+			if(!feedback) return false; // silent fail
+
+			let data = `${msg.author.tag}: ${feedback}\n`; // '!swear feedback '.length == 16
+			log(stuff.feedbackFile, data);
+
+			return 'Thanks for the feedback!';
+		case 'help':
+			return '!swear [...] ```\nhelp: shows this help message \nlist: shows the list of words that are counted \n' +
+			'top [users, servers, swears]: shows the global statistics of the bot \nstats: shows the server stats```';
+		case 'list':
+			return `${NOTICE}\nSwears that are counted:\n${stuff.swears.join(', ')}.`;
+		case 'top':
+			if(args.length >= 3 && args[2] != 'swears') {
+				if(args[2] == 'users') {
+					return `${NOTICE}${getWorstUsers()}`;
+				} else if(args[2] == 'servers' || args[2] == 'guilds') {
+					return `${NOTICE}${getWorstGuilds()}`;
+				} 
+				// TODO? maybe send a helpful message here
+			}
+			return `${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`;
+		case 'shutdown':
+		case 'restart':
+			if(msg.author.id == stuff.devId) {
+				// special one
+				msg.author.send('Shutting Down...').then(() => client.destroy()).then(() => process.exit(0));
+			}
+			return false; // just in case
+		case 'stat':
+			return `${NOTICE}\nTop 5 Swears in this Server:\n${getSwearStats(stats.guilds[msg.guild.id].swears)}\nTotal: ${stats.guilds[msg.guild.id].total}`;
+		default:
+			if(msg.mentions.users.size == 0)
+				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
+
+			// user mentions, if none, show help
+			let send = NOTICE;
+			for(let user of msg.mentions.users.values()) {
+				if(DEBUG) console.log(user.id);
+				send += getUserStats(user.id) + '\n';
+			}
+			return send;
+	}
+}
+
+function log(file, data, debugStr = data) {
+	fs.appendFile(file, data, err => {
+		if(err) console.error(err);
+		if(DEBUG) console.log(debugStr);
+	});
+}
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', msg => {
-	if(msg.author.id == stuff.clientId)
+	if(msg.author.id == client.user.id)
 		return; // ignore swearbot messages
 
 	let lower = msg.content.toLowerCase();
-	let args = lower.split(' ');
-	// this is disgustingly long
-	if(args[0] == '!swear') {
-		switch(args[1]) {
-			case 'help':
-				msg.channel.send('!swear [...] ```\nhelp: shows this help message \nlist: shows the list of words that are counted \n' +
-				'top [users, servers, swears]: shows the global statistics of the bot \nstats: shows the server stats```');
-				break;
-			case 'list':
-				msg.channel.send(`${NOTICE}\nSwears that are counted:\n${stuff.swears.join(', ')}.`);
-				break;
-			case 'top':
-				if(args.length >= 3) {
-					if(args[2] == 'users') {
-						msg.channel.send(`${NOTICE}${getWorstUsers()}`);
-					} else if(args[2] == 'servers' || args[2] == 'guilds') {
-						msg.channel.send(`${NOTICE}${getWorstGuilds()}`);
-					} else if(args[2] == 'swears') {
-						msg.channel.send(`${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`);
-					} 
-				} else {
-					msg.channel.send(`${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`);
-				}
-				break;
-			case 'shutdown':
-			case 'restart':
-				if(msg.author.id == stuff.devId) {
-					msg.author.send('Shutting Down...').then(() => process.exit(0));
-				}
-				break;
-			case 'stat':
-				msg.channel.send(`${NOTICE}\nTop 5 Swears in this Server:\n${getSwearStats(stats.guilds[msg.guild.id].swears)}\nTotal: ${stats.guilds[msg.guild.id].total}`);
-				break;
-			default:
-				// user mentions, if none, show help
-				for(let user in msg.mentions.users) {
-					msg.channel.send(getUserStats(msg.mentions.users[user].id));
-				}
-
+	if(lower.startsWith('!swear')) {
+		let args = lower.split(' ');
+		let send = commands(msg, args);
+		if(send) {
+			msg.channel.send(send);
 		}
 		return; // skip the rest because we just got a command
 	}
@@ -140,14 +163,12 @@ client.on('message', msg => {
 			stats.total++;
 
 			if(mGuild.available) {
-				let guild = stats.guilds[mGuild.id];
-				stats.guilds[mGuild.id] = doStat(guild, mGuild.name, swear);
+				stats.guilds[mGuild.id] = doStat(stats.guilds[mGuild.id], mGuild.name, swear);
 			} else {
-				console.log(`Discord server outage detected on ${new Date().toISOString()}.`)
+				log(stuff.logFile, `Server outage detected: ${new Date().toISOString()}`);
 			}
 			
-			let user = stats.users[author.id];
-			stats.users[author.id] = doStat(user, author.username, swear);
+			stats.users[author.id] = doStat(stats.users[author.id], author.username, swear);
 		}
 	}
 });
@@ -158,7 +179,7 @@ setInterval( () => {
 	// save stats to file
 	let data = JSON.stringify(stats, null, 2); // make human readable
 	fs.writeFile(stuff.file, data, err => {
-		if(err) console.log(err);
+		if(err) console.error(err);
 		if(DEBUG) console.log('Data written to file, unless printed otherwise.');
 	});
 }, 300000); // every 5 minutes
