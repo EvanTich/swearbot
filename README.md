@@ -1,5 +1,7 @@
 # swearbot
- Shows statistics about swears that are used on Discord servers.
+Shows statistics about swears that are used on Discord servers.
+
+**Note:** remember to run reset.bat before running run.bat.
 
 ## Commands
 ```
