@@ -4,6 +4,12 @@ module.exports.file = './stats.json';
 module.exports.logFile = './app.log';
 module.exports.feedbackFile = './feedback.txt';
 
+module.exports.activities = [
+	'with fire', 'with naughty words', 'in the sand', 'Dark Souls', // playing
+	'everyone', 'more bad words', 'Mozart', 'some screaming', // listening to
+	'the chat', 'someone yell', 'interesting videos', 'DEFCON 1' // watching
+];
+
 // this is probably the most i've used any swear word in a single hour
 module.exports.swears = [
 	'fuck', 'cunt', 'ass', 'damn', 'damnit',
@@ -14,5 +20,6 @@ module.exports.swears = [
 	'horseshit', 'jesus fuck', 'prick', 'shitass', 'shit ass',
 	'slut', 'son of a bitch', 'twat', 'nigger', 'fag',
 	// nice words
-	'frick', 'dang', 'darn', 'hecc', 'hekk', 'heck', 'poo', 'pee'
+	'frick', 'dang', 'darn', 'hecc', 'hekk', 'heck', 'poo', 'pee',
+	'dingus'
 ];

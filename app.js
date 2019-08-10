@@ -87,6 +87,15 @@ function commands(msg, args) {
 	switch(args[1]) {
 		// case 'about': // now that I think about it I don't like random people contacting me through discord
 		// 	return `Created by <@${stuff.devId}> because I thought it was an ok concept.`;
+		case 'invite':
+		case 'link':
+			return new Discord.RichEmbed()
+				.setAuthor(client.user.username)
+				.setTitle('Here\'s a link! (Click here)')
+				.setURL('https://discordapp.com/api/oauth2/authorize?client_id=608505931495374861&permissions=379968&scope=bot')
+				.setDescription('This bot is not safe for work nor the light-hearted.')
+				.setColor('GREEN')
+				.setThumbnail(client.user.avatarURL);
 		case 'feedback':
 			let feedback = msg.content.substring(16).trim();
 			if(!feedback) return false; // silent fail
@@ -103,6 +112,7 @@ function commands(msg, args) {
 			'  top [users, servers, swears]: shows the global statistics of the bot.\n' + 
 			'  here | stats: shows the statistics for the current server.\n' + 
 			'  feedback [message...]: gives feedback to the developer of the bot. Thanks!\n' + 
+			'  invite | link: gives a link for adding the bot to your own server. \n' + 
 			'  @mention(s): gives user statistics based on who you mention in the message.```';
 		case 'list':
 			return `${NOTICE}*Swears that are counted:*\n${stuff.swears.join(', ')}.`;
@@ -160,7 +170,7 @@ client.on('message', msg => {
 		let args = lower.split(' ');
 		let send = commands(msg, args);
 		if(send) {
-			msg.channel.send(send);
+			msg.channel.send(send).catch(console.error);
 		}
 		return; // skip the rest because we just got a command
 	}
@@ -186,7 +196,7 @@ client.on('message', msg => {
 	}
 });
 
-client.login(token.token);
+client.login(token.token).then(() => client.user.setActivity('!swear help'));
 
 setInterval( () => {
 	// periodically save stats to file
@@ -195,4 +205,15 @@ setInterval( () => {
 		if(err) console.error(err);
 		if(DEBUG) console.log('Data written to file, unless printed otherwise.');
 	});
+
+	// change activity randomly
+	if(Math.random() > .5) {
+		// 50% chance for showing help command
+		client.user.setActivity('!swear help');
+	} else {
+		// 50% chance for other fun things
+		let i = Math.floor(Math.random() * stuff.activities.length);
+		let type = ['PLAYING', 'LISTENING', 'WATCHING'][Math.floor(i / 4)];
+		client.user.setActivity(stuff.activities[i], { type });
+	}
 }, 300000); // every 5 minutes
