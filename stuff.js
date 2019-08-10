@@ -1,5 +1,4 @@
 // simple js file for easy access to some constants
-
 module.exports.devId = '203281664699269121';
 module.exports.file = './stats.json';
 module.exports.logFile = './app.log';

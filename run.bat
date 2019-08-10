@@ -1,4 +1,5 @@
 @echo off
+cd $(dirname $0); # fix directory issues
 
 # bash script for running the discord bot easily,
 # restarting if anything would happen
