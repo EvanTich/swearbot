@@ -1,8 +1,9 @@
-const NOTICE = '**Notice: This bot, and programmer, does not condone using many of these words.**\n\n';
+const NOTICE = '_**Notice: This bot, and programmer, does not condone using any of these words.**_\n\n';
 const DEBUG = true;
 
 const stuff = require('./stuff');
 const token = require('./token');
+
 const Discord = require('discord.js');
 const fs = require('fs');
 const client = new Discord.Client();
@@ -26,7 +27,7 @@ function getSwearStats(swears, n = 5) {
 }
 
 function getStats(thing) {
-	return `${thing.names.join(', ')}: Total: ${thing.total}\n${getSwearStats(thing.swears)}`;
+	return `**${thing.names.join(', ')}**: Total: ${thing.total}\n${getSwearStats(thing.swears)}`;
 }
 
 function getWorstStat(stat, statString, func = getStats, n = 5) {
@@ -100,11 +101,11 @@ function commands(msg, args) {
 			'  help: shows this help message.\n' + 
 			'  list: shows the list of words that are counted.\n' +
 			'  top [users, servers, swears]: shows the global statistics of the bot.\n' + 
-			'  stats: shows the server stats.\n' + 
-			'  feedback [message...]: gives feedback to the developer of this bot. Thanks!\n' + 
+			'  here | stats: shows the statistics for the current server.\n' + 
+			'  feedback [message...]: gives feedback to the developer of the bot. Thanks!\n' + 
 			'  @mention(s): gives user statistics based on who you mention in the message.```';
 		case 'list':
-			return `${NOTICE}\nSwears that are counted:\n${stuff.swears.join(', ')}.`;
+			return `${NOTICE}*Swears that are counted:*\n${stuff.swears.join(', ')}.`;
 		case 'top':
 			if(args.length >= 3 && args[2] != 'swears') {
 				if(args[2] == 'users') {
@@ -122,8 +123,9 @@ function commands(msg, args) {
 				msg.author.send('Shutting Down...').then(() => client.destroy()).then(() => process.exit(0));
 			}
 			return false; // just in case
-		case 'stat':
-			return `${NOTICE}\nCurrent Server Statistics:\n${getGuildStats(msg.guild.id)}`;
+		case 'here':
+		case 'stats':
+			return `${NOTICE}**Current Server Statistics:**\n${getGuildStats(msg.guild.id)}`;
 		default:
 			if(msg.mentions.users.size == 0)
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
@@ -187,7 +189,7 @@ client.on('message', msg => {
 client.login(token.token);
 
 setInterval( () => {
-	// save stats to file
+	// periodically save stats to file
 	let data = JSON.stringify(stats, null, 2); // make human readable
 	fs.writeFile(stuff.file, data, err => {
 		if(err) console.error(err);
