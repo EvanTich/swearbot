@@ -89,4 +89,5 @@ typings/
 
 
 # My secret files
-secret.js
+token.js
+feedback.txt

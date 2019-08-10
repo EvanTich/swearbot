@@ -1,7 +1,8 @@
 const NOTICE = '**Notice: This bot, and programmer, does not condone using many of these words.**\n\n';
 const DEBUG = true;
 
-const stuff = require('./secret');
+const stuff = require('./stuff');
+const token = require('./token');
 const Discord = require('discord.js');
 const fs = require('fs');
 const client = new Discord.Client();
@@ -40,16 +41,20 @@ function getWorstStat(stat, statString, func = getStats, n = 5) {
 	return rtn;
 }
 
-function getGuildStats(guildId) {
-	return getStats(stats.guilds[guildId]);
+function getGuildStats(guild) {
+	if(guild.id in stats.guilds)
+		return getStats(stats.guilds[guild.id]);
+	return `Nobody in ${guild.name} has said any bad words.`;
 }
 
 function getWorstGuilds(n = 5) {
 	return getWorstStat(stats.guilds, 'Guilds');
 }
 
-function getUserStats(userId) {
-	return getStats(stats.users[userId]);
+function getUserStats(user) {
+	if(user.id in stats.users)
+		return getStats(stats.users[user.id]);
+	return `${user.username} has not uttered *any* profanities while under the watch of the swear bot.`;
 }
 
 function getWorstUsers(n = 5) {
@@ -79,7 +84,7 @@ function doStat(thing, name, swear) {
 
 function commands(msg, args) {
 	switch(args[1]) {
-		// case 'about':
+		// case 'about': // now that I think about it I don't like random people contacting me through discord
 		// 	return `Created by <@${stuff.devId}> because I thought it was an ok concept.`;
 		case 'feedback':
 			let feedback = msg.content.substring(16).trim();
@@ -90,8 +95,14 @@ function commands(msg, args) {
 
 			return 'Thanks for the feedback!';
 		case 'help':
-			return '!swear [...] ```\nhelp: shows this help message \nlist: shows the list of words that are counted \n' +
-			'top [users, servers, swears]: shows the global statistics of the bot \nstats: shows the server stats```';
+			// this spacing is for my own sanity
+			return 'Help: ```!swear [...]\n' + 
+			'  help: shows this help message.\n' + 
+			'  list: shows the list of words that are counted.\n' +
+			'  top [users, servers, swears]: shows the global statistics of the bot.\n' + 
+			'  stats: shows the server stats.\n' + 
+			'  feedback [message...]: gives feedback to the developer of this bot. Thanks!\n' + 
+			'  @mention(s): gives user statistics based on who you mention in the message.```';
 		case 'list':
 			return `${NOTICE}\nSwears that are counted:\n${stuff.swears.join(', ')}.`;
 		case 'top':
@@ -104,7 +115,7 @@ function commands(msg, args) {
 				// TODO? maybe send a helpful message here
 			}
 			return `${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`;
-		case 'shutdown':
+		case 'shutdown': // dev only
 		case 'restart':
 			if(msg.author.id == stuff.devId) {
 				// special one
@@ -112,7 +123,7 @@ function commands(msg, args) {
 			}
 			return false; // just in case
 		case 'stat':
-			return `${NOTICE}\nTop 5 Swears in this Server:\n${getSwearStats(stats.guilds[msg.guild.id].swears)}\nTotal: ${stats.guilds[msg.guild.id].total}`;
+			return `${NOTICE}\nCurrent Server Statistics:\n${getGuildStats(msg.guild.id)}`;
 		default:
 			if(msg.mentions.users.size == 0)
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
@@ -121,7 +132,7 @@ function commands(msg, args) {
 			let send = NOTICE;
 			for(let user of msg.mentions.users.values()) {
 				if(DEBUG) console.log(user.id);
-				send += getUserStats(user.id) + '\n';
+				send += getUserStats(user) + '\n';
 			}
 			return send;
 	}
@@ -156,7 +167,7 @@ client.on('message', msg => {
 	let mGuild = msg.guild;
 	
 	for(let swear of stuff.swears) {
-		if(lower.includes(swear)) {
+		if(lower.includes(swear)) { // if the message includes the swear
 			if(stats.swears[swear] == null)
 				stats.swears[swear] = 0; // define as initial value if not
 			stats.swears[swear]++;
@@ -173,7 +184,7 @@ client.on('message', msg => {
 	}
 });
 
-client.login(stuff.token);
+client.login(token.token);
 
 setInterval( () => {
 	// save stats to file
