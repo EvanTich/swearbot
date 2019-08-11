@@ -1,5 +1,5 @@
 const NOTICE = '_**Notice: This bot, and programmer, does not condone using any of these words.**_\n\n';
-const DEBUG = true;
+const DEBUG = false;
 
 const stuff = require('./stuff');
 const token = require('./token');
@@ -108,11 +108,11 @@ function commands(msg, args) {
 			// this spacing is for my own sanity
 			return 'Help: ```!swear [...]\n' + 
 			'  help: shows this help message.\n' + 
-			'  list: shows the list of words that are counted.\n' +
+			'  list: shows the list of words that are counted.\n' + 
 			'  top [users, servers, swears]: shows the global statistics of the bot.\n' + 
 			'  here | stats: shows the statistics for the current server.\n' + 
 			'  feedback [message...]: gives feedback to the developer of the bot. Thanks!\n' + 
-			'  invite | link: gives a link for adding the bot to your own server. \n' + 
+			'  invite | link: gives a link for adding the bot to your own server.\n' + 
 			'  @mention(s): gives user statistics based on who you mention in the message.```';
 		case 'list':
 			return `${NOTICE}*Swears that are counted:*\n${stuff.swears.join(', ')}.`;
