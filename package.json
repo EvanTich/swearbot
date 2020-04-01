@@ -5,14 +5,14 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js && pause",
-    "lint": "eslint --ext .js ."
+    "lint": "./node_modules/.bin/eslint --ext .js ."
   },
   "author": "Evan Tichenor",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.5.1"
+    "discord.js": "^12.1.1"
   },
   "devDependencies": {
-    "eslint": "^6.0.1"
+    "eslint": "^6.8.0"
   }
 }
