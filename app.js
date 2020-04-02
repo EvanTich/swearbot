@@ -183,20 +183,30 @@ function commands(msg, args) {
 			log(data, config.feedbackFile);
 
 			return 'Thanks for the feedback!';
+		case 'h':
 		case 'help':
 			return config.help;
+		case 'l':
+		case 'ls':
 		case 'list':
 			return `I am not at liberty to say the whole list, but I keep track of ${config.swears.length} swears.`;
+		case 't':
 		case 'top':
+			let n = 5;
 			if(args.length >= 2) {
+				// check if there is a number
+				if(args.length >= 3)
+					n = parseInt(args[2]) | n; // loosely parsing argument to a number
+
 				switch(args[1].toLowerCase()) {
-					case 'users': return `${NOTICE}${getWorstUsers()}`;
+					case 'users': return `${NOTICE}${getWorstUsers(n)}`;
 					case 'servers':
-					case 'guilds': return `${NOTICE}${getWorstGuilds()}`;
+					case 'guilds': return `${NOTICE}${getWorstGuilds(n)}`;
 				}
-				// TODO? maybe send a helpful message here
+				
+				n = parseInt(args[2]) | n;
 			}
-			return `${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears)}\nGrand Total: ${stats.total}`;
+			return `${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears, n)}\nGrand Total: ${stats.total}`;
 		case 'shutdown': // dev only
 		case 'restart':
 			if(msg.author.id == config.devId) {
@@ -210,6 +220,8 @@ function commands(msg, args) {
 		default:
 			if(msg.mentions.users.size == 0)
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
+
+			// TODO: add optional n number
 
 			// user mentions, if none, show help
 			let send = NOTICE;

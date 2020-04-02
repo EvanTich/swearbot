@@ -6,12 +6,12 @@ const feedbackFile = './feedback.txt';
 const prefixes     = ['!swear', 's.'];
 
 const help = `Help: \`\`\`!swear [...]
-  help: Shows this help message.
-  list: Shows the list of words that are counted.
-  top [users | servers | swears] [n = 5]: shows the top n global statistics of the bot.
+  h | help: Shows this help message.
+  l | ls | list: Shows the list of words that are counted.
+  t | top [users | servers | swears] [n = 5]: shows the top n number global statistics of the bot.
   here | stats: shows the statistics for the current server.
-  feedback <message...>: gives feedback to the developer of the bot. Thanks!
-  invite | link: gives a link for adding the bot to your own server.
+  fb | feedback <message...>: gives feedback to the developer of the bot. Thanks!
+  link | invite: gives a link for adding the bot to your own server.
   @mention(s): gives user statistics based on who you mention in the message.\`\`\``;
 
 // fun bits and bobs
