@@ -183,7 +183,7 @@ function commands(msg, args) {
 			let feedback = args.slice(1).join(' ');
 			if(!feedback) return false; // silent fail
 
-			let data = `${msg.author.tag}: ${feedback}\n`; // '!swear feedback '.length == 16
+			let data = `${msg.author.tag}: ${feedback}\n`;
 			log(data, config.feedbackFile);
 
 			return 'Thanks for the feedback!';
@@ -199,8 +199,8 @@ function commands(msg, args) {
 			n = 5;
 			if(args.length >= 2) {
 				// check if there is a number
-				if(args.length >= 3)
-					n = parseInt(args[2]) | n; // loosely parsing argument to a number
+				if(args.length >= 3 && !isNaN(args[2]))
+					n = parseInt(args[2]); // loosely parsing argument to a number
 
 				switch(args[1].toLowerCase()) {
 					case 'users': return `${NOTICE}${getWorstUsers(n)}`;
@@ -208,7 +208,8 @@ function commands(msg, args) {
 					case 'guilds': return `${NOTICE}${getWorstGuilds(n)}`;
 				}
 				
-				n = parseInt(args[1]) | n; // check again just in case
+				if(!isNaN(args[1]))
+					n = parseInt(args[1]); // check again just in case
 			}
 			return `${NOTICE}Top ${n} Swears:\n${getSwearStats(stats.swears, n)}\nGrand Total: ${stats.total}`;
 		case 'shutdown': // dev only
@@ -222,8 +223,8 @@ function commands(msg, args) {
 		case 'stats':
 			// optional n number
 			n = 5;
-			if(args.length >= 2)
-				n = parseInt(args[1]) | n;
+			if(args.length >= 2 && !isNaN(args[1]))
+				n = parseInt(args[1]);
 
 			return `${NOTICE}**Current Guild Statistics:**\n${getGuildStats(msg.guild)}`;
 		default:
@@ -231,7 +232,9 @@ function commands(msg, args) {
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
 
 			// optional n number
-			n = parseInt(args[args.length - 1]) | 5;
+			n = 5;
+			if(!isNaN(args[args.length - 1]))
+				n = parseInt(args[args.length - 1]);
 
 			// user mentions, if none, show help
 			let send = NOTICE;
