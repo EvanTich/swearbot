@@ -5,7 +5,7 @@ const logFile      = './app.log';
 const feedbackFile = './feedback.txt';
 const prefixes     = ['!swear', 'sw.'];
 
-const help = `Help: \`\`\`!swear [...]
+const help = `Help: \`\`\`sw.[...]
   h | help: Shows this help message.
   l | ls | list: Shows the list of words that are counted.
   t | top [users | servers | swears] [n = 5]: shows the top n number global statistics of the bot.

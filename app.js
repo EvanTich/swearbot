@@ -208,7 +208,7 @@ function commands(msg, args) {
 					case 'guilds': return `${NOTICE}${getWorstGuilds(n)}`;
 				}
 				
-				n = parseInt(args[2]) | n; // check again just in case
+				n = parseInt(args[1]) | n; // check again just in case
 			}
 			return `${NOTICE}Top ${n} Swears:\n${getSwearStats(stats.swears, n)}\nGrand Total: ${stats.total}`;
 		case 'shutdown': // dev only
