@@ -166,6 +166,7 @@ function doStat(stat, name, swear) {
  * 		Returns false if there is no message. Can also return a RichEmbed for inviting.
  */
 function commands(msg, args) {
+	let n; // ok js
 	switch(args[0].toLowerCase()) {
 		// case 'about': // now that I think about it I don't like random people contacting me through discord
 		// 	return `Created by <@${config.devId}> because I thought it was an ok concept.`;
@@ -195,7 +196,7 @@ function commands(msg, args) {
 			return `I am not at liberty to say the whole list, but I keep track of ${config.swears.length} swears.`;
 		case 't':
 		case 'top':
-			let n = 5;
+			n = 5;
 			if(args.length >= 2) {
 				// check if there is a number
 				if(args.length >= 3)
@@ -209,7 +210,7 @@ function commands(msg, args) {
 				
 				n = parseInt(args[2]) | n; // check again just in case
 			}
-			return `${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears, n)}\nGrand Total: ${stats.total}`;
+			return `${NOTICE}Top ${n} Swears:\n${getSwearStats(stats.swears, n)}\nGrand Total: ${stats.total}`;
 		case 'shutdown': // dev only
 		case 'restart':
 			if(msg.author.id == config.devId) {
@@ -220,7 +221,7 @@ function commands(msg, args) {
 		case 'here':
 		case 'stats':
 			// optional n number
-			let n = 5;
+			n = 5;
 			if(args.length >= 2)
 				n = parseInt(args[1]) | n;
 
@@ -230,7 +231,7 @@ function commands(msg, args) {
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
 
 			// optional n number
-			let n = parseInt(args[args.length - 1]) | 5;
+			n = parseInt(args[args.length - 1]) | 5;
 
 			// user mentions, if none, show help
 			let send = NOTICE;
