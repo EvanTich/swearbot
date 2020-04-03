@@ -274,10 +274,10 @@ client.on('message', msg => {
 			let send = commands(msg, args);
 			if(send) {
 				if(send.length > 2000) {
-					msg.reply('The output is too big! Please use less arguments for the command.').catch(console.error);
-					return; // cant send the actual message because it is more than 2000 characters (a discord message limit)
+					// cant send the actual message because it is more than 2000 characters (a discord message limit)
+					send = 'The output is too big! Please use less arguments for the command.';
 				}
-				msg.reply(send).catch(console.error);
+				msg.channel.send(send).catch(console.error);
 			}
 			return; // skip the rest because we just got a command
 		}
