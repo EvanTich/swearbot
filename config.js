@@ -3,7 +3,7 @@ const devId        = '203281664699269121';
 const file         = './stats.json';
 const logFile      = './app.log';
 const feedbackFile = './feedback.txt';
-const prefixes     = ['!swear', 's.'];
+const prefixes     = ['!swear', 'sw.'];
 
 const help = `Help: \`\`\`!swear [...]
   h | help: Shows this help message.
@@ -12,7 +12,7 @@ const help = `Help: \`\`\`!swear [...]
   here | stats: shows the statistics for the current server.
   fb | feedback <message...>: gives feedback to the developer of the bot. Thanks!
   link | invite: gives a link for adding the bot to your own server.
-  @mention(s): gives user statistics based on who you mention in the message.\`\`\``;
+  @mention(s) [n = 5]: gives top n swears used by the users mentioned.\`\`\``;
 
 // fun bits and bobs
 const activities = [

@@ -53,11 +53,12 @@ function getSwearStats(swears, n = 5) {
  *  ${getSwearStats}`
  * 
  * @see getSwearStats
- * @param {Stat} stat A single user/guild stat object.
+ * @param {Stat}   stat    A single user/guild stat object.
+ * @param {Number} [n = 5] The number of swears to gather.
  * @return {String} A string containing a formatted message with user/guild swear stats.
  */
-function getStats(stat) {
-	return `**${stat.names.join(', ')}**: Total: ${stat.total}\n${getSwearStats(stat.swears)}`;
+function getStats(stat, n = 5) {
+	return `**${stat.names.join(', ')}**: Total: ${stat.total}\n${getSwearStats(stat.swears, n)}`;
 }
 
 /**
@@ -85,12 +86,13 @@ function getWorstStat(stat, statString, n = 5, func = getStats) {
  * Formats the given guild object into a string with it's swear stats.
  * @see discord.js
  * @see getStats
- * @param {Guild} guild The guild to get stats for.
+ * @param {Guild}  guild   The guild to get stats for.
+ * @param {Number} [n = 5] The number of swears to gather.
  * @return {String} A string with the given guild stats.
  */
-function getGuildStats(guild) {
+function getGuildStats(guild, n = 5) {
 	if(guild.id in stats.guilds)
-		return getStats(stats.guilds[guild.id]);
+		return getStats(stats.guilds[guild.id], n);
 	return `Nobody in ${guild.name} has said any bad words.`;
 }
 
@@ -98,12 +100,13 @@ function getGuildStats(guild) {
  * Formats the given guild object into a string with it's swear stats.
  * @see discord.js
  * @see getStats
- * @param {User} user The user to get stats for.
+ * @param {User}   user    The user to get stats for.
+ * @param {Number} [n = 5] The number of swears to gather.
  * @return {String} A string with the given user stats.
  */
-function getUserStats(user) {
+function getUserStats(user, n = 5) {
 	if(user.id in stats.users)
-		return getStats(stats.users[user.id]);
+		return getStats(stats.users[user.id], n);
 	return `${user.username} has not uttered *any* profanities while under the watch of the swear bot.`;
 }
 
@@ -204,7 +207,7 @@ function commands(msg, args) {
 					case 'guilds': return `${NOTICE}${getWorstGuilds(n)}`;
 				}
 				
-				n = parseInt(args[2]) | n;
+				n = parseInt(args[2]) | n; // check again just in case
 			}
 			return `${NOTICE}Top 5 Swears:\n${getSwearStats(stats.swears, n)}\nGrand Total: ${stats.total}`;
 		case 'shutdown': // dev only
@@ -216,25 +219,31 @@ function commands(msg, args) {
 			return false; // just in case
 		case 'here':
 		case 'stats':
+			// optional n number
+			let n = 5;
+			if(args.length >= 2)
+				n = parseInt(args[1]) | n;
+
 			return `${NOTICE}**Current Guild Statistics:**\n${getGuildStats(msg.guild)}`;
 		default:
 			if(msg.mentions.users.size == 0)
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
 
-			// TODO: add optional n number
+			// optional n number
+			let n = parseInt(args[args.length - 1]) | 5;
 
 			// user mentions, if none, show help
 			let send = NOTICE;
 			for(let user of msg.mentions.users.values()) {
 				if(DEBUG) console.log(user.id);
-				send += getUserStats(user) + '\n';
+				send += getUserStats(user, n) + '\n';
 			}
 			return send;
 	}
 }
 
 /**
- * Appends log data to a file. Basically unused.
+ * Appends log data to a file. Basically unused otherthan for feedback and server outages.
  * @param {String} data The data to be appended to the log.
  * @param {String} file Path to the log file.
  * @param {String} debugStr String to print if in debug mode.
@@ -260,7 +269,11 @@ client.on('message', msg => {
 			let args = msg.content.slice(prefix.length).trim().split(/ +/g);
 			let send = commands(msg, args);
 			if(send) {
-				msg.channel.send(send).catch(console.error);
+				if(send.length > 2000) {
+					msg.reply('The output is too big! Please use less arguments for the command.').catch(console.error);
+					return; // cant send the actual message because it is more than 2000 characters (a discord message limit)
+				}
+				msg.reply(send).catch(console.error);
 			}
 			return; // skip the rest because we just got a command
 		}
@@ -301,7 +314,7 @@ setInterval( () => {
 	// change activity randomly
 	if(Math.random() > .5) {
 		// 50% chance for showing help command
-		client.user.setActivity('!swear help');
+		client.user.setActivity('sw.help');
 	} else {
 		// 50% chance for other fun things
 		let i = Math.floor(Math.random() * config.activities.length);
