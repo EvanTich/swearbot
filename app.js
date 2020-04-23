@@ -225,11 +225,11 @@ function commands(msg, args) {
 			n = 5;
 			if(args.length >= 2 && !isNaN(args[1]))
 				n = parseInt(args[1]);
-            
-            // only send the current guild message if this was sent from a guild
-            if(msg.guild) {
-                return `${NOTICE}**Current Guild Statistics:**\n${getGuildStats(msg.guild, n)}`;
-            }
+			
+			// only send the current guild message if this was sent from a guild
+			if(msg.guild) {
+				return `${NOTICE}**Current Guild Statistics:**\n${getGuildStats(msg.guild, n)}`;
+			}
 
 			return `${NOTICE}${getUserStats(msg.author.id, n)}`;
 		default:
@@ -265,7 +265,7 @@ function log(data, file = config.logFile, debugStr = data) {
 }
 
 client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+	console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', msg => {
