@@ -225,8 +225,13 @@ function commands(msg, args) {
 			n = 5;
 			if(args.length >= 2 && !isNaN(args[1]))
 				n = parseInt(args[1]);
+            
+            // only send the current guild message if this was sent from a guild
+            if(msg.guild) {
+                return `${NOTICE}**Current Guild Statistics:**\n${getGuildStats(msg.guild, n)}`;
+            }
 
-			return `${NOTICE}**Current Guild Statistics:**\n${getGuildStats(msg.guild)}`;
+			return `${NOTICE}${getUserStats(msg.author.id, n)}`;
 		default:
 			if(msg.mentions.users.size == 0)
 				return 'No users mentioned. Please @mention the user(s) you want to see statistics for.';
