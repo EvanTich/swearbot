@@ -1,6 +1,6 @@
 {
   "name": "swearbot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shows statistics about swears that are used on Discord servers.",
   "main": "app.js",
   "scripts": {

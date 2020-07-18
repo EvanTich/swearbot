@@ -8,7 +8,6 @@ const Discord = require('discord.js');
 const fs = require('fs');
 const client = new Discord.Client();
 
-
 /**
  * Nice documentation for people who want it. I did it mostly for practice, but it is also useful.
  */
@@ -28,7 +27,12 @@ const client = new Discord.Client();
  * @property {StatDict} users  An index of Stats keyed by a user id string.
  * @property {StatDict} guilds An index of Stats keyed by a guild id string.
  */
-var stats = require(config.file); // ez (but bad)
+var stats;
+try {
+	stats = require(config.file); // ez (but bad)
+} catch(e) {
+	stats = require(config.defaultFile); // something went wrong with the stats, uh oh
+}
 
 /**
  * Formats the top n number of swears in the given swear dictionary into an easy to read message.
@@ -179,6 +183,7 @@ function commands(msg, args) {
 				.setDescription('This bot is not safe for work nor the light-hearted.')
 				.setColor('GREEN')
 				.setThumbnail(client.user.avatarURL);
+        case 'fb':
 		case 'feedback':
 			let feedback = args.slice(1).join(' ');
 			if(!feedback) return false; // silent fail
@@ -287,7 +292,6 @@ client.on('message', msg => {
 			return; // skip the rest because we just got a command
 		}
 	}
-	
 
 	let author = msg.author;
 	let mGuild = msg.guild;
@@ -310,9 +314,15 @@ client.on('message', msg => {
 	}
 });
 
+client.on('error', console.error);
+client.on('shardError', err => {
+	console.error('Websocket error:', err);
+});
+
 client.login(token.token).then(() => client.user.setActivity('!swear help'));
 
-setInterval( () => {
+// ensure this shit does not crash when this is running
+setInterval(() => {
 	// periodically save stats to file
 	let data = JSON.stringify(stats, null, 2); // make human readable
 	fs.writeFile(config.file, data, err => {
@@ -320,14 +330,17 @@ setInterval( () => {
 		if(DEBUG) console.log('Data written to file, unless printed otherwise.');
 	});
 
-	// change activity randomly
-	if(Math.random() > .5) {
-		// 50% chance for showing help command
-		client.user.setActivity('sw.help');
-	} else {
-		// 50% chance for other fun things
-		let i = Math.floor(Math.random() * config.activities.length);
-		let type = ['PLAYING', 'LISTENING', 'WATCHING'][Math.floor(i / 4)];
-		client.user.setActivity(config.activities[i], { type });
+	// time to die, error
+	if(client.user) {
+		// change activity randomly
+		if(Math.random() > .5) {
+			// 50% chance for showing help command
+			client.user.setActivity('sw.help');
+		} else {
+			// 50% chance for other fun things
+			let i = Math.floor(Math.random() * config.activities.length);
+			let type = ['PLAYING', 'LISTENING', 'WATCHING'][Math.floor(i / 4)];
+			client.user.setActivity(config.activities[i], { type });
+		}
 	}
 }, 300000); // every 5 minutes

@@ -1,6 +1,7 @@
 // simple js file for easy access to some constants
 const devId        = '203281664699269121';
 const file         = './stats.json';
+const defaultFile  = './default_stats.json';
 const logFile      = './app.log';
 const feedbackFile = './feedback.txt';
 const prefixes     = ['!swear', 'sw.'];
@@ -38,6 +39,7 @@ const swears = [
 module.exports = {
 	devId,
 	file,
+	defaultFile,
 	logFile,
 	feedbackFile,
 	prefixes,
